@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>西南大学导航主页</title>
+    <style>
+        /* 设置整体字体和背景 */
+        body {
+            font-family: Arial, sans-serif; /* 使用通用的字体 */
+            margin: 0;
+            padding: 0;
+            background: url('../static/images/campus_background.jpg') no-repeat center center fixed; 
+            background-size: cover; /* 确保背景图片覆盖整个页面 */
+            color: white; /* 白色文本 */
+            text-align: center; /* 文本居中显示 */
+            height: 100vh; /* 确保body的高度覆盖整个视窗高度 */
+            display: flex;
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+        }
+
+        /* 容器用来包裹内容，调整背景和边角 */
+        .container {
+            padding: 20px;
+            background-color: rgba(0, 0, 100, 0.7); /* 半透明的深蓝色背景 */
+            border-radius: 10px; /* 边角圆润 */
+        }
+
+        /* 标题的样式 */
+        h1 {
+            font-size: 2.5em; /* 大号字体 */
+        }
+
+        /* 链接的样式 */
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            color: white; /* 白色文字 */
+            background-color: #007BFF; /* 亮蓝色背景 */
+            border-radius: 5px; /* 圆角 */
+            text-decoration: none; /* 去除下划线 */
+            margin-top: 20px; /* 上边距 */
+            transition: background-color 0.3s; /* 过渡效果 */
+        }
+
+        a:hover {
+            background-color: #0056b3; /* 鼠标悬浮时背景色变深 */
+        }
+
+        /* Logo样式 */
+        .logo {
+            width: 100px; /* 增大Logo的宽度 */
+            height: auto; /* 高度自动 */
+            margin-bottom: 20px; /* 下边距 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="../static/images/swu_logo.png" alt="西南大学Logo" class="logo">
+        <h1>欢迎使用西南大学导航系统</h1>
+        <a href="/navigation">开始导航</a>
+    </div>
+</body>
+</html>

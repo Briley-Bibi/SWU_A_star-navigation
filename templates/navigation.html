@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>A* Pathfinding Visualization</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  canvas {
+    display: block;
+  }
+  label {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  button {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<h1>A* Pathfinding Visualization</h1>
+<label for="alphaSlider">速度优先</label>
+<input type="range" id="alphaSlider" min="0" max="1" step="0.01" value="0.5">
+<span class="label-text">景观优先</span>
+<br/>
+<button onclick="runAStar()">开始导航</button>
+<button onclick="reset()">重置</button>
+<div id="error-message" style="color: red;"></div>
+<canvas id="canvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let start = null;
+  let end = null;
+  const backgroundImage = new Image();
+  backgroundImage.src = '../static/images/background.png'; // 您的图片路径
+  const paths = []; // 存储路径和颜色
+
+  backgroundImage.onload = function() {
+    canvas.width = backgroundImage.width;
+    canvas.height = backgroundImage.height;
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+  }
+
+  canvas.addEventListener('click', function(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    if (!start) {
+        start = [x, y];
+        drawStartEnd(start, 'start');
+    } else if (!end) {
+        end = [x, y];
+        drawStartEnd(end, 'end');
+    }
+  });
+
+  function reset() {
+    start = null;
+    end = null;
+    paths.length = 0;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+  }
+
+  function drawStartEnd(position, type) {
+    const radius = 5;
+    const color = type === 'start' ? 'green' : 'red';
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(position[0], position[1], radius, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  function runAStar() {
+    const alpha = parseFloat(1 - document.getElementById('alphaSlider').value);
+    const beta = parseFloat(document.getElementById('alphaSlider').value);
+    if (start && end) {
+      fetch('/runAstar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ start, end, alpha, beta })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (!data || !data.path) {
+          console.error('Invalid data received:', data);
+          return;
+        }
+        // 生成更鲜明且色差大的颜色
+        const numberOfPaths = paths.length;
+        const hueIncrement = 360 / (numberOfPaths + 1); // 计算色相增量
+        const hue = (numberOfPaths * hueIncrement) % 360; // 为每个新路径分配一个固定间隔的色相
+        const saturation = 90 + Math.random() * 10; // 饱和度在90%到100%之间
+        const lightness = 40 + Math.random() * 20; // 亮度在40%到60%之间
+        const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+        paths.push({ path: data.path, color: color });
+        drawPath(data.path, color);
+      })
+      .catch(error => displayError(error.message));
+    } else {
+      displayError('请选择起点和终点');
+    }
+  }
+
+  function displayError(message) {
+    const errorDiv = document.getElementById('error-message');
+    errorDiv.textContent = message;
+  }
+
+  function drawPath(path, color) {
+    if (!path || path.length === 0) {
+      console.error('Path is undefined or empty');
+      return;
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(path[0][0], path[0][1]);
+    for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(path[i][0], path[i][1]);
+    }
+    ctx.stroke();
+  }
+
+</script>
+</body>
+</html>
